@@ -1,4 +1,7 @@
 import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 import AppError from "../utils/AppError.js";
 import asyncHandler from "./asyncHandler.middleware.js";
@@ -13,18 +16,36 @@ export const isLoggedIn = asyncHandler(async (req, _res, next) => {
   }
 
   // Decoding the token using jwt package verify method
-  const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+  // const decoded = await jwt.verify(token, process.env.JWT_SECRET);
 
-  // If no decode send the message unauthorized
-  if (!decoded) {
-    return next(new AppError("Unauthorized, please login to continue", 401));
+  // // If no decode send the message unauthorized
+  // if (!decoded) {
+  //   return next(new AppError("Unauthorized, please login to continue", 401));
+  // }
+
+  // // If all good store the id in req object, here we are modifying the request object and adding a custom field user in it
+  // req.user = decoded;
+
+  // // Do not forget to call the next other wise the flow of execution will not be passed further
+  // next();
+
+  try {
+    // Decoding the token using jwt package verify method
+    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+  
+    // If all good store the id in req object, here we are modifying the request object and adding a custom field user in it
+    req.user = decoded;
+  
+    // Do not forget to call the next otherwise the flow of execution will not be passed further
+    next();
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return next(new AppError('Your session has expired. Please log in again.', 401));
+    } else {
+      return next(new AppError('Unauthorized, please login to continue', 401));
+    }
   }
-
-  // If all good store the id in req object, here we are modifying the request object and adding a custom field user in it
-  req.user = decoded;
-
-  // Do not forget to call the next other wise the flow of execution will not be passed further
-  next();
+  
 });
 
 

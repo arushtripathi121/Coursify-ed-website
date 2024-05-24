@@ -73,9 +73,9 @@ userSchema.methods = {
     try {
       return await jwt.sign(
         { id: this._id, role: this.role, subscription: this.subscription },
-        process.env.JWT_SECRET,
+        'arush12345',
         {
-          expiresIn: process.env.JWT_EXPIRY,
+          expiresIn: 3600,
         }
       );
     } catch (error) {
