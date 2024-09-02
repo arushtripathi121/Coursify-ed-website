@@ -8,15 +8,10 @@ import errorMiddleware from './middlewares/error.middleware.js';
 
 const app = express();
 
-// Middlewares
-// Built-In
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-// Third-Party
 app.use(
   cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
+    origin: process.env.FRONTEND_URL,
   })
 );
 app.use(morgan('dev'));
